@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, InternalServerErrorException, Param, Post, Put, SetMetadata, UploadedFile, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, InternalServerErrorException, Param, Post, Put, SetMetadata, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { RoleGuard } from 'src/common/guards/role.guard';
 import { JwtGuard } from 'src/common/guards/jwt.guard';
 import { CreateProductDto } from './dto/create-products.dto';
 import { UpdateProductDto } from './dto/update-products.dto';
 import { S3Service } from 'src/core/storage/s3/s3.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('products')
 export class ProductsController {
@@ -14,6 +15,7 @@ export class ProductsController {
   @UseGuards(RoleGuard)
   @UseGuards(JwtGuard)
   @SetMetadata('roles', ['ADMIN', 'SUPERADMIN'])
+  @UseInterceptors(FileInterceptor('file'))
   async createProduct(@Body() body: CreateProductDto, @UploadedFile() file: Express.Multer.File) {
     try {
       const fileUrl = await this.s3Servise.uploadFile(file,'images')

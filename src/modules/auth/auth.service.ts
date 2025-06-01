@@ -35,8 +35,10 @@ export class AuthService {
           username
         }
       })
+      console.log('salomqq');
+      
       if (!findUser) return new UnauthorizedException('username or password is incorecct')
-      const comparePassword = await bcrypt.compare(body.password, findUser.password)
+      const comparePassword = await bcrypt.compare(body.password, findUser.password);
       if (!comparePassword) return new UnauthorizedException('username or password is incorecct')
       const { password, ...result } = findUser
       const access_token = this.jwt.sign(result)
@@ -49,27 +51,27 @@ export class AuthService {
   }
   async login(body: LoginValidatorDto) {
     try {
-      const username = body.username
+      const username = body.username;
       const findUser = await this.prisma.user.findUnique({
         where: {
-          username
-        }
-      })
-      if (!findUser) return new UnauthorizedException('username or password is incorecct')
-      if (findUser.role === 'USER') return new BadRequestException('username or password incorecct')
-      console.log(findUser.password);
-      console.log(await bcrypt.hash(body.password,10));
-      const comparePassword = bcrypt.compare(findUser.password, body.password);
-      if (!comparePassword) return new UnauthorizedException('username or password is incorecct')
-      const { password, ...result } = findUser
-      const access_token = this.jwt.sign(result)
+          username,
+        },
+      });
+
+      if (!findUser) throw new UnauthorizedException('username or password is incorrect');
+      if (findUser.role === 'USER') throw new BadRequestException('username or password is incorrect');
+      const comparePassword = await bcrypt.compare(body.password, findUser.password);
+      if (!comparePassword) throw new UnauthorizedException('username or password is incorrect');
+      const { password, ...result } = findUser;
+      const access_token = this.jwt.sign(result);
       return {
-        access_token
-      }
+        access_token,
+      };
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
+
   async registerAdmin(body: RegisterValidatorDto) {
     try {
       body['role'] = 'ADMIN'

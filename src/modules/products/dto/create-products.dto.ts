@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
@@ -18,7 +19,9 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'Monthly price is required' })
   monthly_price: string;
 
+  @Transform(({ value }) => parseInt(value, 10))
   @IsInt({ message: 'Price must be an integer' })
+  @IsNotEmpty({ message: 'Price is required' })
   price: number;
 
 }

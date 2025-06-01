@@ -7,8 +7,8 @@ export class JwtGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const { access_token } = request.cookies
-    const data = await this.jwtService.verifyAsync(access_token);
+    const {access_token} = request.cookies
+    const data = await this.jwtService.verifyAsync(access_token.access_token);
     if (!data) throw new UnauthorizedException('token is invlid')
     request.user = data;
     return true;

@@ -2,8 +2,6 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { CreateProductDto } from './dto/create-products.dto';
 import { UpdateProductDto } from './dto/update-products.dto';
 import { DbService } from 'src/core/database/db.service';
-import { time } from 'console';
-
 @Injectable()
 export class ProductsService {
     constructor(private prisma: DbService) { }
@@ -62,7 +60,7 @@ export class ProductsService {
             const productFile = await this.prisma.productFile.create({
                 data: {
                     productId: product.id,
-                    fileUrl
+                    fileUrl:fileUrl.url
                 }
             })
             return {

@@ -14,9 +14,9 @@ export class RentController {
     @UseGuards(RoleGuard)
     @UseGuards(JwtGuard)
     @SetMetadata('roles', ['ADMIN', 'SUPERADMIN'])
-    async createrent(@Body() body: CreateRent,@Query('productId') productId:string,@Query('id') id:string) {
+    async createrent(@Body() body: CreateRent,@Query('productId') productId:string,@Req() req:Request) {
       try {
-        
+        const id = req['user'].id
         return await this.rentService.createrent(body,id,productId)
       } catch (error) {
         throw new InternalServerErrorException(error)

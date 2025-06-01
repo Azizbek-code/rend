@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  fullName String
+  username String @unique
+  email    String @unique
+  phone    String
+  password String
+  userFile UserFIle[]
+  role     Role   @default(USER)
+  rent     Rent?
+
+  @@map("users")
+}
+
+model Product {
+  id            String @id @default(uuid())
+  name          String
+  description   String
+  monthly_price String
+  price         Int
+  productFIle ProductFile[]
+  rent          Rent[]
+
+  @@map("products")
+}
+
+model Rent {
+  id               String    @id @default(uuid())
+  productId        String
+  remaining_amount String
+  amount           Float
+  end_time            DateTime
+  monthly_payment  DateTime
+  status           Status    @default(pending)
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id])
+  product          Product   @relation(fields: [productId], references: [id])
+  payment          Payment[]
+
+  @@map("rents")
+}
+
+model Payment {
+  id          String        @id @default(uuid())
+  rentId      String        @unique
+  amount      Int
+  method      PaymentMethod @default(CASH)
+  description String?
+  rent        Rent          @relation(fields: [rentId], references: [id])
+  paidAt      DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("payments")
+}
+
+model UserFIle {
+  id String @id @default(uuid())
+  userId String
+  fileUrl String
+  user User @relation(fields: [userId],references: [id])
+}
+
+model ProductFile {
+  id String @id @default(uuid())
+  productId String
+  fileUrl String
+  product Product @relation(fields: [productId],references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+
+  @@map("roles")
+}
+
+enum Status {
+  pending
+  rejected
+  payed
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+}
